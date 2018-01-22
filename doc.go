@@ -20,7 +20,8 @@ Implements the Connector concept in Golang.
 			doer.Do()
 		}
 
-		for _, item := range conn.Get(reflect.TypeOf(talker)) {
+		typ := reflect.TypeOf((*Talker)(nil)).Elem()
+		for _, item := range conn.Get(typ) {
 			talker := item.(Talker)
 			talker.Say()
 		}

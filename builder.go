@@ -1,7 +1,6 @@
 package connector
 
 import (
-	"fmt"
 	"reflect"
 )
 
@@ -30,8 +29,16 @@ func (B *Builder) Name() string {
 }
 
 // Named returns the name of the Builder (i.e. Connector)
-func (B *Builder) Named() string {
-	return B.name
+func (B *Builder) Named() []Named {
+	all := []Named{}
+	for _, item := range B.items {
+		named, ok := item.(Named)
+		if ok {
+			all = append(all, named)
+		}
+	}
+
+	return all
 }
 
 // Items returns all Items
@@ -118,22 +125,9 @@ func (B *Builder) Get(typ reflect.Type) []interface{} {
 
 	for _, item := range B.items {
 		it := reflect.TypeOf(item)
-		// iel := it.Elem()
-		// tel := typ.Elem()
-		fmt.Println(typ, it)
-		// fmt.Println(iel, tel)
-		fmt.Println()
-
-		continue
-		/*
-			if typ.Implements(iel) {
-				all = append(all, item)
-			}
-			conn, ok := item.(Connector)
-			if ok {
-				all = append(all, conn.Get(typ)...)
-			}
-		*/
+		if it.Implements(typ) {
+			all = append(all, item)
+		}
 	}
 
 	return all

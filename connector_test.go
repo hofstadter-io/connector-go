@@ -2,6 +2,7 @@ package connector
 
 import (
 	"fmt"
+	"reflect"
 	"testing"
 
 	. "github.com/franela/goblin"
@@ -36,6 +37,14 @@ func TestNew(t *testing.T) {
 			g.Assert(len(conn.Connectors())).Equal(0)
 		})
 	})
+}
+
+type Doer interface {
+	Do() string
+}
+
+type Talker interface {
+	Say() string
 }
 
 type foo struct {
@@ -126,11 +135,29 @@ func TestGet(t *testing.T) {
 	g := Goblin(t)
 	g.Describe("Getting from a Connection", func() {
 		conn := New("my-connector")
-		conn.Add(foo{}, boo{}, moo{})
+		conn.Add(&foo{}, &boo{}, &moo{})
 
 		g.It("should start with multple items", func() {
 			g.Assert(len(conn.Items())).Equal(3)
 		})
 
+		g.It("should get all named items", func() {
+			g.Assert(len(conn.Named())).Equal(3)
+		})
+
+		g.It("should get all Named items", func() {
+			typ := reflect.TypeOf((*Named)(nil)).Elem()
+			g.Assert(len(conn.Get(typ))).Equal(3)
+		})
+
+		g.It("should get all Doer items", func() {
+			typ := reflect.TypeOf((*Doer)(nil)).Elem()
+			g.Assert(len(conn.Get(typ))).Equal(3)
+		})
+
+		g.It("should get all Talker items", func() {
+			typ := reflect.TypeOf((*Talker)(nil)).Elem()
+			g.Assert(len(conn.Get(typ))).Equal(2)
+		})
 	})
 }

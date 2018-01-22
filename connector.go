@@ -61,16 +61,17 @@ type Filterable interface {
 
 // Connector is all the things, put together. Go Get(reflect.Type)'em
 type Connector interface {
-	Named
-
 	Get(reflect.Type) []interface{}
 
+	Named
 	Namer
 	Itemizer
 	Connected
 	Addable
-	// Stored
+	// Deletable
+	// Clearable
 	// Indexed
 	// Searchable
+	// Filterable
 
 }

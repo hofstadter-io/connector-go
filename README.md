@@ -26,7 +26,8 @@ func main () {
         }
     }
 
-    for _, item := range conn.Get(reflect.TypeOf(Talker)) {
+    typ := reflect.TypeOf((*Talker)(nil)).Elem()
+    for _, item := range conn.Get(typ) {
         talker := item.(Talker)
         talker.Say()
     }

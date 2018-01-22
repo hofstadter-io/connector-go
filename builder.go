@@ -5,15 +5,13 @@ import (
 	"reflect"
 )
 
-// Builder ...
-//   is the 'Connector' implementation
+// Builder is the base implementation
 type Builder struct {
 	name  string
 	items []interface{}
 }
 
-// New ...
-// Creates a new Builder (i.e. Connector) with the given name.
+// New creates a new Builder (i.e. Connector) with the given name.
 // Name must have a non-emtpy value.
 // It should also be unique, but that is not enforced.
 func New(name string) *Builder {
@@ -26,14 +24,17 @@ func New(name string) *Builder {
 	}
 }
 
-// Name ...
-// Returns the name of the Builder (i.e. Connector)
+// Name returns the name of the Builder (i.e. Connector)
 func (B *Builder) Name() string {
 	return B.name
 }
 
-// Items ...
-// Returns all Items
+// Named returns the name of the Builder (i.e. Connector)
+func (B *Builder) Named() string {
+	return B.name
+}
+
+// Items returns all Items
 func (B *Builder) Items() []interface{} {
 	all := []interface{}{}
 	for _, item := range B.items {
@@ -49,8 +50,7 @@ func (B *Builder) Items() []interface{} {
 	return all
 }
 
-// Connectors ...
-// Returns all Connector's found amongst the items
+// Connectors returns all Connector's found amongst the items
 func (B *Builder) Connectors() []Connector {
 	all := []Connector{}
 	for _, item := range B.items {
@@ -64,8 +64,7 @@ func (B *Builder) Connectors() []Connector {
 	return all
 }
 
-// Add ...
-// Adds items to a Connector. May be a single object, slice, or any mix.
+// Add adds items to a Connector. Input may be a single object, slice, or any mix.
 func (B *Builder) Add(in ...interface{}) {
 	B.add(in)
 }
@@ -88,8 +87,7 @@ func (B *Builder) add(in interface{}) {
 	}
 }
 
-// Del ...
-// Deletes an item or list of items from the connector.
+// Del deletes an item or list of items from the connector.
 func (B *Builder) Del(out interface{}) {
 	switch ot := out.(type) {
 	case []interface{}:
@@ -102,22 +100,18 @@ func (B *Builder) Del(out interface{}) {
 	// TODO otherwise look for objects
 }
 
-// Clear ...
-// Clears all items from this Connector.
+// Clear clears all items from this Connector.
 // Will not effect connectors which this had been added to.
 func (B *Builder) Clear() {
 	B.items = []interface{}{}
 }
 
-/*Get ...
-
-Get is the main function of Connector.
+/*Get is the main function of Connector.
 
 Once a number of items have been added,
 we will want to retrieve some subset of those.
 The Get() Function will return all items
-that match the supplied type
-
+that match the given type
 */
 func (B *Builder) Get(typ reflect.Type) []interface{} {
 	all := []interface{}{}

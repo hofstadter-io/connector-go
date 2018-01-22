@@ -79,7 +79,7 @@ func (m *moo) Say() string {
 
 func TestAdd(t *testing.T) {
 	g := Goblin(t)
-	g.Describe("A Connection", func() {
+	g.Describe("Adding to a Connection", func() {
 
 		g.It("should be able to add a single item", func() {
 			conn := New("my-connector")
@@ -117,6 +117,19 @@ func TestAdd(t *testing.T) {
 
 			conn.Add(moo{}, []interface{}{foo{}, boo{}}, foo{}, []interface{}{foo{}, boo{}, moo{}})
 			g.Assert(len(conn.Items())).Equal(7)
+		})
+
+	})
+}
+
+func TestGet(t *testing.T) {
+	g := Goblin(t)
+	g.Describe("Getting from a Connection", func() {
+		conn := New("my-connector")
+		conn.Add(foo{}, boo{}, moo{})
+
+		g.It("should start with multple items", func() {
+			g.Assert(len(conn.Items())).Equal(3)
 		})
 
 	})

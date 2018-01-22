@@ -12,7 +12,7 @@ type Builder struct {
 }
 
 // New creates a new Builder (i.e. Connector) with the given name.
-// Name must have a non-emtpy value.
+// Name must have a non-empty value.
 // It should also be unique, but that is not enforced.
 func New(name string) *Builder {
 	if name == "" {

@@ -20,11 +20,13 @@ func main () {
     }
 
     for _, item := range conn.Items() {
-        doer := item.(Doer)
-        doer.Do()
+        doer, ok := item.(Doer)
+        if ok {
+            doer.Do()
+        }
     }
 
-    for _, item := range conn.Get(reflect.TypeOf(talker)) {
+    for _, item := range conn.Get(reflect.TypeOf(Talker)) {
         talker := item.(Talker)
         talker.Say()
     }

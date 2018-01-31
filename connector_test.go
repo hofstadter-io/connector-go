@@ -2,7 +2,6 @@ package connector
 
 import (
 	"fmt"
-	"reflect"
 	"testing"
 
 	. "github.com/franela/goblin"
@@ -12,7 +11,7 @@ func TestNew(t *testing.T) {
 	g := Goblin(t)
 	g.Describe("A New Connection", func() {
 		g.It("should be nil if not given a name", func() {
-			g.Assert(New("")).Equal((*Builder)(nil))
+			g.Assert(New("")).Equal((*Base)(nil))
 		})
 
 		conn := New("name")
@@ -146,18 +145,15 @@ func TestGet(t *testing.T) {
 		})
 
 		g.It("should get all Named items", func() {
-			typ := reflect.TypeOf((*Named)(nil)).Elem()
-			g.Assert(len(conn.Get(typ))).Equal(3)
+			g.Assert(len(conn.Get((*Named)(nil)))).Equal(3)
 		})
 
 		g.It("should get all Doer items", func() {
-			typ := reflect.TypeOf((*Doer)(nil)).Elem()
-			g.Assert(len(conn.Get(typ))).Equal(3)
+			g.Assert(len(conn.Get((*Doer)(nil)))).Equal(3)
 		})
 
 		g.It("should get all Talker items", func() {
-			typ := reflect.TypeOf((*Talker)(nil)).Elem()
-			g.Assert(len(conn.Get(typ))).Equal(2)
+			g.Assert(len(conn.Get((*Talker)(nil)))).Equal(2)
 		})
 	})
 }

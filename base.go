@@ -120,26 +120,6 @@ we will want to retrieve some subset of those.
 The Get() Function will return all items
 that match the given type
 */
-func (B *Base) OldGet(typ reflect.Type) []interface{} {
-	all := []interface{}{}
-
-	for _, item := range B.items {
-		it := reflect.TypeOf(item)
-		if it.Implements(typ) {
-			all = append(all, item)
-		}
-	}
-
-	return all
-}
-
-/*GetType is an attemt to simplify the Get user experience
-
-Once a number of items have been added,
-we will want to retrieve some subset of those.
-The Get() Function will return all items
-that match the given type
-*/
 func (B *Base) Get(in interface{}) []interface{} {
 	typ := reflect.TypeOf(in).Elem()
 	all := []interface{}{}

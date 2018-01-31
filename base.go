@@ -4,32 +4,32 @@ import (
 	"reflect"
 )
 
-// Builder is the base implementation
-type Builder struct {
+// Base is the base implementation
+type Base struct {
 	name  string
 	items []interface{}
 }
 
-// New creates a new Builder (i.e. Connector) with the given name.
+// New creates a new Base (i.e. Connector) with the given name.
 // Name must have a non-empty value.
 // It should also be unique, but that is not enforced.
-func New(name string) *Builder {
+func New(name string) *Base {
 	if name == "" {
 		return nil
 	}
-	return &Builder{
+	return &Base{
 		name:  name,
 		items: []interface{}{},
 	}
 }
 
-// Name returns the name of the Builder (i.e. Connector)
-func (B *Builder) Name() string {
+// Name returns the name of the Base (i.e. Connector)
+func (B *Base) Name() string {
 	return B.name
 }
 
-// Named returns the name of the Builder (i.e. Connector)
-func (B *Builder) Named() []Named {
+// Named returns the name of the Base (i.e. Connector)
+func (B *Base) Named() []Named {
 	all := []Named{}
 	for _, item := range B.items {
 		named, ok := item.(Named)
@@ -42,7 +42,7 @@ func (B *Builder) Named() []Named {
 }
 
 // Items returns all Items
-func (B *Builder) Items() []interface{} {
+func (B *Base) Items() []interface{} {
 	all := []interface{}{}
 	for _, item := range B.items {
 		all = append(all, item)
@@ -58,7 +58,7 @@ func (B *Builder) Items() []interface{} {
 }
 
 // Connectors returns all Connector's found amongst the items
-func (B *Builder) Connectors() []Connector {
+func (B *Base) Connectors() []Connector {
 	all := []Connector{}
 	for _, item := range B.items {
 		conn, ok := item.(Connector)
@@ -72,11 +72,11 @@ func (B *Builder) Connectors() []Connector {
 }
 
 // Add adds items to a Connector. Input may be a single object, slice, or any mix.
-func (B *Builder) Add(in ...interface{}) {
+func (B *Base) Add(in ...interface{}) {
 	B.add(in)
 }
 
-func (B *Builder) add(in interface{}) {
+func (B *Base) add(in interface{}) {
 	switch it := in.(type) {
 	case []interface{}:
 		for _, i := range it {
@@ -95,7 +95,7 @@ func (B *Builder) add(in interface{}) {
 }
 
 // Del deletes an item or list of items from the connector.
-func (B *Builder) Del(out interface{}) {
+func (B *Base) Del(out interface{}) {
 	switch ot := out.(type) {
 	case []interface{}:
 		for _, o := range ot {
@@ -109,18 +109,18 @@ func (B *Builder) Del(out interface{}) {
 
 // Clear clears all items from this Connector.
 // Will not effect connectors which this had been added to.
-func (B *Builder) Clear() {
+func (B *Base) Clear() {
 	B.items = []interface{}{}
 }
 
-/*Get is the main function of Connector.
+/*Get will return items which implement a given type or interface.
 
 Once a number of items have been added,
 we will want to retrieve some subset of those.
 The Get() Function will return all items
 that match the given type
 */
-func (B *Builder) Get(typ reflect.Type) []interface{} {
+func (B *Base) OldGet(typ reflect.Type) []interface{} {
 	all := []interface{}{}
 
 	for _, item := range B.items {
@@ -131,4 +131,38 @@ func (B *Builder) Get(typ reflect.Type) []interface{} {
 	}
 
 	return all
+}
+
+/*GetType is an attemt to simplify the Get user experience
+
+Once a number of items have been added,
+we will want to retrieve some subset of those.
+The Get() Function will return all items
+that match the given type
+*/
+func (B *Base) Get(in interface{}) []interface{} {
+	typ := reflect.TypeOf(in).Elem()
+	all := []interface{}{}
+
+	for _, item := range B.items {
+		it := reflect.TypeOf(item)
+		if it.Implements(typ) {
+			all = append(all, item)
+		}
+	}
+
+	return all
+}
+
+/*Connect is the main usage function.
+
+Connect() recursively passes a Connector object to all items
+so that they may consume or use any items in the Connector.
+Typically, we build up a root Connector and then
+call Connect with itself as the argument.
+*/
+func (B *Base) Connect(c Connector) {
+	for _, conn := range B.Connectors() {
+		conn.Connect(c)
+	}
 }

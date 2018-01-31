@@ -1,7 +1,5 @@
 package connector
 
-import "reflect"
-
 // Named - things which have a Name()
 type Named interface {
 	Name() string
@@ -27,6 +25,12 @@ type Addable interface {
 	Add(...interface{})
 }
 
+// Gettable - things which can be Get()-ed from.
+// Extracts all the items which match a given type. Go Get()'em !!
+type Gettable interface {
+	Get(interface{}) []interface{}
+}
+
 // Deletable - things which can be Del()-ed from
 type Deletable interface {
 	Del(interface{})
@@ -37,9 +41,10 @@ type Clearable interface {
 	Clear()
 }
 
-// Stored - hings that hold other things [Add(),Del(),Clear()]
+// Stored - hings that hold other things [Add(),Get(),Del(),Clear()]
 type Stored interface {
 	Addable
+	Gettable
 	Deletable
 	Clearable
 }
@@ -59,14 +64,20 @@ type Filterable interface {
 	Filter(func(interface{}) bool) []interface{}
 }
 
-// Connector is all the things, put together. Go Get(reflect.Type)'em
+// Connector is all the things, put together.
+//
+// Connect() recursively passes a Connector object to all items
+// so that they may consume or use any items in the Connector.
+// Typically, we build up a root Connector and then
+// call Connect with itself as the argument.
 type Connector interface {
-	Get(reflect.Type) []interface{}
+	Connect(Connector)
 
 	Named
 	Namer
 	Itemizer
 	Connected
+	Gettable
 	Addable
 	// Deletable
 	// Clearable

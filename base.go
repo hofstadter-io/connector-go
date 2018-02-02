@@ -57,20 +57,6 @@ func (B *Base) Items() []interface{} {
 	return all
 }
 
-// Connectors returns all Connector's found amongst the items
-func (B *Base) Connectors() []Connector {
-	all := []Connector{}
-	for _, item := range B.items {
-		conn, ok := item.(Connector)
-		if ok {
-			all = append(all, conn)
-			all = append(all, conn.Connectors()...)
-		}
-	}
-
-	return all
-}
-
 // Add adds items to a Connector. Input may be a single object, slice, or any mix.
 func (B *Base) Add(in ...interface{}) {
 	B.add(in)
@@ -142,7 +128,10 @@ Typically, we build up a root Connector and then
 call Connect with itself as the argument.
 */
 func (B *Base) Connect(c Connector) {
-	for _, conn := range B.Connectors() {
-		conn.Connect(c)
+	for _, item := range B.Items() {
+		switch typ := item.(type) {
+		case Connectable:
+			typ.Connect(c)
+		}
 	}
 }

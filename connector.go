@@ -15,9 +15,9 @@ type Itemizer interface {
 	Items() []interface{}
 }
 
-// Connected - things which have Connectors()
-type Connected interface {
-	Connectors() []Connector
+// Connectable - things which consume Connectors
+type Connectable interface {
+	Connect(Connector)
 }
 
 // Addable - things which can be Add()-ed to
@@ -25,8 +25,7 @@ type Addable interface {
 	Add(...interface{})
 }
 
-// Gettable - things which can be Get()-ed from.
-// Extracts all the items which match a given type. Go Get()'em !!
+// Gettable - things which can be Get()-ed from, by type
 type Gettable interface {
 	Get(interface{}) []interface{}
 }
@@ -65,20 +64,22 @@ type Filterable interface {
 }
 
 // Connector is all the things, put together.
-//
-// Connect() recursively passes a Connector object to all items
-// so that they may consume or use any items in the Connector.
-// Typically, we build up a root Connector and then
-// call Connect with itself as the argument.
 type Connector interface {
+	// Connect() recursively passes a Connector object to all items
+	// so that they may consume or use any items in the Connector.
+	// Typically, we build up a root Connector and then
+	// call Connect with itself as the argument.
 	Connect(Connector)
 
-	Named
-	Namer
-	Itemizer
-	Connected
-	Gettable
-	Addable
+	// Extracts all the items which match a given type. Go Get()'em !!
+	Get(interface{}) []interface{}
+
+	// Named
+	// Namer
+	// Itemizer
+	// Connected
+	// Gettable
+	// Addable
 	// Deletable
 	// Clearable
 	// Indexed

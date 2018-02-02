@@ -7,6 +7,12 @@
 
 A Golang implementation of the __Connector__ concept.
 
+Examples:
+
+- https://github.com/verdverm/vermui-starterkit
+
+Basic Code:
+
 ```go
 import "github.com/hofstadter-io/connector-go"
 
@@ -26,8 +32,7 @@ func main () {
         }
     }
 
-    typ := reflect.TypeOf((*Talker)(nil)).Elem()
-    for _, item := range conn.Get(typ) {
+    for _, item := range conn.Get((*Talker)(nil)) {
         talker := item.(Talker)
         talker.Say()
     }

@@ -47,11 +47,13 @@ func (B *Base) Items() []interface{} {
 	for _, item := range B.items {
 		all = append(all, item)
 
+		/* should have been added recursively when Add(...) was called
 		// recurse if (also) module
 		itmzr, ok := item.(Itemizer)
 		if ok {
 			all = append(all, itmzr.Items()...)
 		}
+		*/
 	}
 
 	return all

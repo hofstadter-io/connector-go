@@ -13,14 +13,20 @@ type Base struct {
 // New creates a new Base (i.e. Connector) with the given name.
 // Name must have a non-empty value.
 // It should also be unique, but that is not enforced.
-func New(name string) *Base {
+func New(name string, items ...interface{}) *Base {
 	if name == "" {
 		return nil
 	}
-	return &Base{
+	B := &Base{
 		name:  name,
 		items: []interface{}{},
 	}
+
+	if len(items) > 0 {
+		B.Add(items)
+	}
+
+	return B
 }
 
 // Name returns the name of the Base (i.e. Connector)
@@ -30,6 +36,7 @@ func (B *Base) Name() string {
 
 // Named returns the name of the Base (i.e. Connector)
 func (B *Base) Named() []Named {
+	// make a copy
 	all := []Named{}
 	for _, item := range B.items {
 		named, ok := item.(Named)
@@ -43,17 +50,10 @@ func (B *Base) Named() []Named {
 
 // Items returns all Items
 func (B *Base) Items() []interface{} {
+	// make a copy
 	all := []interface{}{}
 	for _, item := range B.items {
 		all = append(all, item)
-
-		/* should have been added recursively when Add(...) was called
-		// recurse if (also) module
-		itmzr, ok := item.(Itemizer)
-		if ok {
-			all = append(all, itmzr.Items()...)
-		}
-		*/
 	}
 
 	return all
@@ -76,7 +76,7 @@ func (B *Base) add(in interface{}) {
 		itmzr, ok := in.(Itemizer)
 		if ok {
 			for _, i := range itmzr.Items() {
-				B.add(i)
+				B.items = append(B.items, i)
 			}
 		}
 	}
@@ -110,8 +110,9 @@ that match the given type
 */
 func (B *Base) Get(in interface{}) []interface{} {
 	typ := reflect.TypeOf(in).Elem()
-	all := []interface{}{}
 
+	// make a copy
+	all := []interface{}{}
 	for _, item := range B.items {
 		it := reflect.TypeOf(item)
 		if it.Implements(typ) {
